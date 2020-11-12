@@ -11,14 +11,16 @@ namespace DataType
             short s = short.MaxValue;
             int i = int.MaxValue;
             long l = long.MaxValue;
-            float f = 3.14;
+            float f = 3.14F;
             double d = 3.141592;
             decimal de = decimal.MaxValue;
             char ch = 'A';
             string str = "asdf";
-            object obj = "아무거나";
+            object obj = null;
 
-
+            int? i2 = null;
+            Console.WriteLine(str);
+            Console.ReadLine();
         }
     }
 }
