@@ -8,6 +8,8 @@ namespace Diary
 {
     class DiaryData
     {
+        public DateTime Date;
+        public string Title;
         public string Content;
     }
 }
