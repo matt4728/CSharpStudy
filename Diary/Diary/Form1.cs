@@ -14,7 +14,18 @@ namespace Diary
 {
     public partial class Form1 : Form
     {
+        public class TagControlData
+        {
+            public int Index { get; set; }
+            public string TagText { get; set; }
+            public Label Control { get; set; }
+            public Button DeleteButton { get; set; }
+        }
+
         private DiaryData diary;
+
+        private List<TagControlData> _tagData = new List<TagControlData>();
+
         public Form1()
         {
             InitializeComponent();
@@ -45,21 +56,77 @@ namespace Diary
         {
             if (e.KeyCode == Keys.Enter)
             {
+                var tagText = textBox2.Text;
                 var y = 203;
 
                 var newTagLabel = new Label();
-                
-                newTagLabel.Text = textBox2.Text;
-                newTagLabel.SetBounds(
-                    textBox2.Left, y, 100, 20);
 
-                textBox2.Left += 100;
-                textBox2.Text = "";
+                newTagLabel.Text = tagText;
+                
+                var deleteButton = new Button();
+                deleteButton.Text = "X";
+                
+                deleteButton.Click += (_, __) =>
+                {
+                    TagControlData removedData = null;
+                    foreach (var tagData in _tagData)
+                    {
+                        if (tagData.Control == newTagLabel)
+                        {
+                            removedData = tagData;
+                        }
+                    }
+
+                    _tagData.Remove(removedData);
+                    this.Controls.Remove(removedData.Control);
+                    this.Controls.Remove(removedData.DeleteButton);
+                    UpdateTagList();
+                };
+
+                var tagControlData = new TagControlData
+                {
+                    TagText = tagText,
+                    Control = newTagLabel,
+                    DeleteButton = deleteButton,
+                };
+
 
                 diary.Tags.Add(textBox2.Text);
-
                 this.Controls.Add(newTagLabel);
+                _tagData.Add(tagControlData);
+
+                textBox2.Text = "";
+
+                UpdateTagList();
             }
+        }
+
+        private void DeleteButton_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void UpdateTagList()
+        {
+            int x = 10;
+
+            foreach (var TagItem in _tagData)
+            {
+                TagItem.Control.SetBounds(
+                    x,
+                    203,
+                    70,
+                    20);
+                TagItem.DeleteButton.SetBounds(
+                    x + 70,
+                    203,
+                    20,
+                    20
+                    );
+                x += 100;
+            }
+
+            textBox2.Left = x;
         }
     }
 }
