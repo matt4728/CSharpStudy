@@ -14,15 +14,16 @@ namespace Diary
 {
     public partial class Form1 : Form
     {
+        private DiaryData diary;
         public Form1()
         {
             InitializeComponent();
+            diary = new DiaryData();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             var date = dateTimePicker1.Value;
-            var diary = new DiaryData();
 
             diary.Title = textBox1.Text;
             diary.Content = richTextBox1.Text;
@@ -30,7 +31,7 @@ namespace Diary
 
             var jsonText = JsonConvert.SerializeObject(diary, Formatting.Indented);
             
-            var path = @"C:\Users\matt\Desktop\diary";
+            var path = @"C:\Users\vios\Desktop\diary";
 
             var fileName0 = date.ToString("yyyyMMdd") + ".txt";
             var fileName = $"{date:yyyyMMdd}.json";
@@ -38,6 +39,27 @@ namespace Diary
             var diaryPath = Path.Combine(path, fileName);
 
             File.WriteAllText(diaryPath, jsonText);
+        }
+
+        private void textBox2_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                var y = 203;
+
+                var newTagLabel = new Label();
+                
+                newTagLabel.Text = textBox2.Text;
+                newTagLabel.SetBounds(
+                    textBox2.Left, y, 100, 20);
+
+                textBox2.Left += 100;
+                textBox2.Text = "";
+
+                diary.Tags.Add(textBox2.Text);
+
+                this.Controls.Add(newTagLabel);
+            }
         }
     }
 }

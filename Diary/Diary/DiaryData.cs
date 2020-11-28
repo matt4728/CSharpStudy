@@ -11,5 +11,6 @@ namespace Diary
         public DateTime Date;
         public string Title;
         public string Content;
+        public List<string> Tags = new List<string>();
     }
 }
