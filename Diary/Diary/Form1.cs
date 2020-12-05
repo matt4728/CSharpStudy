@@ -1,13 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Diary
@@ -34,22 +30,14 @@ namespace Diary
 
         private void button1_Click(object sender, EventArgs e)
         {
-            var date = dateTimePicker1.Value;
-
-            diary.Title = textBox1.Text;
-            diary.Content = richTextBox1.Text;
-            diary.Date = dateTimePicker1.Value;
-
-            var jsonText = JsonConvert.SerializeObject(diary, Formatting.Indented);
-            
-            var path = @"C:\Users\vios\Desktop\diary";
-
-            var fileName0 = date.ToString("yyyyMMdd") + ".txt";
-            var fileName = $"{date:yyyyMMdd}.json";
-
-            var diaryPath = Path.Combine(path, fileName);
-
-            File.WriteAllText(diaryPath, jsonText);
+            SaveDiary(
+                title: textBox1.Text,
+                date: dateTimePicker1.Value,
+                text: richTextBox1.Text,
+                tags: _tagData
+                .Select(x => x.TagText)
+                .ToList()
+            );
         }
 
         private void textBox2_KeyDown(object sender, KeyEventArgs e)
@@ -91,7 +79,6 @@ namespace Diary
                 };
 
 
-                diary.Tags.Add(textBox2.Text);
                 this.Controls.Add(newTagLabel);
                 _tagData.Add(tagControlData);
 
@@ -127,6 +114,61 @@ namespace Diary
             }
 
             textBox2.Left = x;
+        }
+
+        private void SaveDiary(string title, DateTime date, string text, List<string> tags, bool encrypted = false)
+        {
+
+            diary.Title = title;
+            diary.Content = text;
+            diary.Date = date;
+            diary.Tags = tags;
+            diary.Encrypted = encrypted;
+
+            var jsonText = JsonConvert.SerializeObject(diary, Formatting.Indented);
+
+            var path = @"C:\Users\vios\Desktop\diary";
+
+            var fileName0 = date.ToString("yyyyMMdd") + ".txt";
+            var fileName = $"{date:yyyyMMdd}.json";
+
+            var diaryPath = Path.Combine(path, fileName);
+
+            File.WriteAllText(diaryPath, jsonText);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var password = textBox3.Text;
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                MessageBox.Show("암호를 확인하세요.");
+                return;
+            }
+
+            while (password.Length < 32)
+            {
+                password = password.Trim() + password.Trim();
+            }
+
+            byte[] key = password
+                .Select(x => (byte)x)
+                .Take(32)
+                .ToArray();
+            byte[] iv = key.Take(16).ToArray();
+
+            var encrypted = Encryptor.EncryptStringToBytes(richTextBox1.Text, key, iv);
+
+            String text = String.Join(",", encrypted);
+            SaveDiary(
+                title: textBox1.Text,
+                date: dateTimePicker1.Value,
+                text: text,
+                tags: _tagData
+                .Select(x => x.TagText)
+                .ToList(),
+                encrypted: true
+            );
         }
     }
 }
